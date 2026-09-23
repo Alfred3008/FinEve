@@ -1,0 +1,350 @@
+{
+  "parameters": [
+    {
+      "parameter_id": "P_001",
+      "name": "Revenue from Operations",
+      "aliases": [
+        "Total Revenue",
+        "Net Sales",
+        "Sales",
+        "Revenue"
+      ],
+      "category": "Growth",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_002",
+      "name": "Trade Receivables",
+      "aliases": [
+        "Accounts Receivable",
+        "Debtors",
+        "Receivables"
+      ],
+      "category": "Efficiency",
+      "is_positive_indicator": false
+    },
+    {
+      "parameter_id": "P_003",
+      "name": "Operating Cash Flow",
+      "aliases": [
+        "Cash Flow from Operations",
+        "CFO",
+        "Net Cash from Operating Activities"
+      ],
+      "category": "Cash Flow",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_004",
+      "name": "Operating Margin",
+      "aliases": [
+        "EBITDA Margin",
+        "Operating Profit Margin",
+        "Margin"
+      ],
+      "category": "Profitability",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_005",
+      "name": "Inventory",
+      "aliases": [
+        "Stock",
+        "Inventories"
+      ],
+      "category": "Efficiency",
+      "is_positive_indicator": false
+    },
+    {
+      "parameter_id": "P_006",
+      "name": "Debt",
+      "aliases": [
+        "Total Debt",
+        "Borrowings",
+        "Long-term Debt"
+      ],
+      "category": "Solvency",
+      "is_positive_indicator": false
+    },
+    {
+      "parameter_id": "P_007",
+      "name": "Interest Coverage Ratio",
+      "aliases": [
+        "Interest Coverage",
+        "Times Interest Earned"
+      ],
+      "category": "Solvency",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_008",
+      "name": "Cash and Cash Equivalents",
+      "aliases": [
+        "Cash and Cash Equivalents",
+        "Cash Balance",
+        "Cash in Hand"
+      ],
+      "category": "Liquidity",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_009",
+      "name": "Return on Equity",
+      "aliases": [
+        "ROE"
+      ],
+      "category": "Profitability",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_010",
+      "name": "Return on Capital Employed",
+      "aliases": [
+        "ROCE"
+      ],
+      "category": "Profitability",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_011",
+      "name": "Capital Expenditure",
+      "aliases": [
+        "Capex",
+        "Capital Spending"
+      ],
+      "category": "Growth",
+      "is_positive_indicator": true
+    },
+    {
+      "parameter_id": "P_012",
+      "name": "Depreciation",
+      "aliases": [
+        "Depreciation and Amortization",
+        "D&A"
+      ],
+      "category": "Asset Management",
+      "is_positive_indicator": false
+    }
+  ],
+  "relationships": [
+    {
+      "relationship_id": "R_001",
+      "parameter_id": "P_001",
+      "direction": "increase",
+      "related_parameter_id": "P_002",
+      "related_direction": "increase",
+      "possible_explanations": [
+        "Revenue growth is being driven by credit sales rather than cash sales",
+        "Customer collection terms have been extended",
+        "Collection efficiency has declined relative to sales growth"
+      ],
+      "evidence_to_check": [
+        "Notes to accounts — trade receivables ageing schedule",
+        "MD&A — commentary on credit policy or customer terms"
+      ],
+      "investigation_path": [
+        "Compare receivables growth rate to revenue growth rate",
+        "Review receivables ageing schedule for signs of slower collection",
+        "Check MD&A for any stated change in credit or collection policy"
+      ],
+      "source_reference": "§24.2 (Revenue ↑ + Receivables ↑ + CFO ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_002",
+      "parameter_id": "P_002",
+      "direction": "increase",
+      "related_parameter_id": "P_003",
+      "related_direction": "decrease",
+      "possible_explanations": [
+        "Revenue recognized is not yet converting to cash, indicating working-capital build-up",
+        "Collection cycle has lengthened, delaying cash realization"
+      ],
+      "evidence_to_check": [
+        "Cash flow statement — working capital adjustments line",
+        "Notes to accounts — receivables ageing"
+      ],
+      "investigation_path": [
+        "Quantify the gap between revenue growth and CFO growth",
+        "Check whether receivables growth alone explains the CFO decline",
+        "Flag for analyst verification against annual report disclosures"
+      ],
+      "source_reference": "§24.2 (Receivables ↑ + Cash Flow ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_003",
+      "parameter_id": "P_001",
+      "direction": "increase",
+      "related_parameter_id": "P_004",
+      "related_direction": "decrease",
+      "possible_explanations": [
+        "Revenue growth is being achieved at the cost of pricing or margin discipline",
+        "Cost base is growing faster than revenue",
+        "Product/segment mix has shifted toward lower-margin offerings"
+      ],
+      "evidence_to_check": [
+        "MD&A — commentary on pricing, discounts, or cost pressures",
+        "Segment disclosures — margin by product/segment"
+      ],
+      "investigation_path": [
+        "Break down margin change by cost-of-goods vs. operating expense",
+        "Check for one-off cost items in the period",
+        "Review segment-level margin disclosures if available"
+      ],
+      "source_reference": "§24.2 (Revenue ↑ + Margin ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_004",
+      "parameter_id": "P_005",
+      "direction": "increase",
+      "related_parameter_id": "P_001",
+      "related_direction": "decrease",
+      "possible_explanations": [
+        "Inventory is building up because sales are slowing",
+        "Demand forecasting has overestimated actual sales",
+        "Product may be facing weaker sell-through or obsolescence risk"
+      ],
+      "evidence_to_check": [
+        "MD&A — commentary on demand, sell-through, or inventory levels",
+        "Notes to accounts — inventory write-down or provisioning disclosures"
+      ],
+      "investigation_path": [
+        "Compare inventory growth rate to sales growth rate",
+        "Check for inventory write-downs or provisions in the notes",
+        "Review MD&A for demand or channel commentary"
+      ],
+      "source_reference": "§24.2 (Inventory ↑ + Sales ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_005",
+      "parameter_id": "P_006",
+      "direction": "increase",
+      "related_parameter_id": "P_007",
+      "related_direction": "decrease",
+      "possible_explanations": [
+        "Additional borrowing has increased interest expense relative to earnings",
+        "Earnings available to cover interest have not grown in proportion to new debt"
+      ],
+      "evidence_to_check": [
+        "Notes to accounts — borrowings schedule and interest rate terms",
+        "MD&A — commentary on financing activity or capital structure"
+      ],
+      "investigation_path": [
+        "Check the purpose of the new debt disclosed in notes or MD&A",
+        "Compare interest expense growth to EBIT growth",
+        "Assess whether the debt increase is linked to a specific investment or acquisition"
+      ],
+      "source_reference": "§24.2 (Debt ↑ + Interest Coverage ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_006",
+      "parameter_id": "P_008",
+      "direction": "increase",
+      "related_parameter_id": "P_006",
+      "related_direction": "increase",
+      "possible_explanations": [
+        "Cash increase is funded by new borrowings rather than operating performance",
+        "Company may be raising debt for future investment, acquisition, or liquidity buffer purposes"
+      ],
+      "evidence_to_check": [
+        "Cash flow statement — financing activities section",
+        "Notes to accounts — new borrowings and their stated purpose"
+      ],
+      "investigation_path": [
+        "Check whether the cash increase is matched by a financing inflow in the cash flow statement",
+        "Review MD&A for the stated purpose of new borrowings",
+        "Distinguish operating-driven cash build-up from debt-driven cash build-up"
+      ],
+      "source_reference": "§24.2 (Cash ↑ + Borrowings ↑)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_007",
+      "parameter_id": "P_009",
+      "direction": "increase",
+      "related_parameter_id": "P_010",
+      "related_direction": "decrease",
+      "possible_explanations": [
+        "ROE improvement may be driven by increased financial leverage rather than operating performance",
+        "Capital structure changes (e.g. buybacks, higher debt) may be inflating ROE relative to ROCE"
+      ],
+      "evidence_to_check": [
+        "Notes to accounts — capital structure and debt-to-equity disclosures",
+        "MD&A — commentary on buybacks or capital allocation"
+      ],
+      "investigation_path": [
+        "Compare leverage (debt-to-equity) trend alongside ROE and ROCE",
+        "Check for share buybacks reducing the equity base",
+        "Assess whether ROCE (which is capital-structure-neutral) tells a different story than ROE"
+      ],
+      "source_reference": "§24.2 (ROE ↑ + ROCE ↓)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    },
+    {
+      "relationship_id": "R_008",
+      "parameter_id": "P_011",
+      "direction": "increase",
+      "related_parameter_id": "P_012",
+      "related_direction": "increase",
+      "possible_explanations": [
+        "New capital expenditure is beginning to generate depreciation charges as assets are capitalized",
+        "This is an expected mechanical relationship as fixed assets grow"
+      ],
+      "evidence_to_check": [
+        "Notes to accounts — fixed asset schedule and capitalization dates",
+        "MD&A — commentary on capacity expansion or capital projects"
+      ],
+      "investigation_path": [
+        "Check the fixed asset schedule for newly capitalized assets",
+        "Verify depreciation policy and useful-life assumptions applied",
+        "Confirm the capex is linked to a disclosed expansion or project"
+      ],
+      "source_reference": "§24.2 (Capex ↑ + Depreciation ↑)",
+      "provenance": {
+        "relationship": "FRF-source",
+        "possible_explanations": "FinEve-authored",
+        "evidence_to_check": "FinEve-authored",
+        "investigation_path": "FinEve-authored"
+      }
+    }
+  ]
+}
