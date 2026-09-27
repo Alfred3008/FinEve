@@ -79,6 +79,29 @@ describe("parseWorkbook", () => {
     expect(result.items[0].value).toBe(120);
   });
 
+  it("trims whitespace from period column headers (regression: trailing-space header caused all parameters to be silently skipped downstream)", () => {
+    const buffer = buildWorkbookBuffer([
+      ["Line Item", "FY2023 ", " FY2024"], // trailing/leading space on headers
+      ["Total Revenue", 100, 120],
+    ]);
+
+    const result = parseWorkbook(buffer);
+
+    expect(result.detected_periods).toEqual(["FY2023", "FY2024"]);
+    expect(result.items).toContainEqual({ raw_label: "Total Revenue", period: "FY2023", value: 100 });
+    expect(result.items).toContainEqual({ raw_label: "Total Revenue", period: "FY2024", value: 120 });
+  });
+
+  it("exposes detected_periods matching the trimmed header row, in file order", () => {
+    const buffer = buildWorkbookBuffer([
+      ["Line Item", "FY2022", "FY2023", "FY2024"],
+      ["Total Revenue", 90, 100, 120],
+    ]);
+
+    const result = parseWorkbook(buffer);
+    expect(result.detected_periods).toEqual(["FY2022", "FY2023", "FY2024"]);
+  });
+
   it("throws if the sheet has fewer than 2 columns", () => {
     const buffer = buildWorkbookBuffer([["Line Item"], ["Total Revenue"]]);
     expect(() => parseWorkbook(buffer)).toThrow(/at least a label column and one period column/);

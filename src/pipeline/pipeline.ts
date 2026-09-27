@@ -31,6 +31,15 @@ export interface PipelineResult {
   unmapped_items: UnmappedLineItem[];
   /** Parameters skipped during change detection (e.g. missing a period, or zero base value). */
   skipped_parameter_ids: string[];
+  /**
+   * The period column headers actually detected in the uploaded file
+   * (trimmed), in file order. Exposed so the caller can show the user
+   * what period names were found, in case the from_period/to_period
+   * they entered don't match any of them — a common silent-failure
+   * mode where every parameter ends up in skipped_parameter_ids with
+   * no obvious reason why.
+   */
+  detected_periods: string[];
   /** Computed changes for every parameter that had values in both periods. */
   observed_changes: ObservedChange[];
   /** FRF relationships matched for each observed change, keyed by parameter_id. */
@@ -51,7 +60,7 @@ export function runPipeline(
   to_period: string,
   kb: FRFKnowledgeBase
 ): PipelineResult {
-  const { items } = parseWorkbook(fileBuffer);
+  const { items, detected_periods } = parseWorkbook(fileBuffer);
 
   const { mapped, unmapped } = mapLineItems(items, kb.parameters);
 
@@ -69,6 +78,7 @@ export function runPipeline(
     mapped_items: mapped,
     unmapped_items: unmapped,
     skipped_parameter_ids: skipped,
+    detected_periods,
     observed_changes: changes,
     relationship_matches,
   };

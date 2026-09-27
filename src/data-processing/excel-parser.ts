@@ -17,7 +17,12 @@
  * header is treated as a period identifier. This module does NOT map
  * labels to canonical parameters — that is parameter-mapping.ts's job.
  * This module only extracts raw (label, period, value) triples,
- * preserving the original label text verbatim.
+ * preserving the original label text verbatim (aside from trimming
+ * surrounding whitespace). Period/column headers are trimmed the same
+ * way, since an untrimmed header (e.g. "FY2023 " with a trailing space)
+ * would silently fail to match the period string the user enters
+ * elsewhere in the UI, causing every parameter for that period to be
+ * skipped downstream with no clear error.
  */
 
 import * as XLSX from "xlsx";
@@ -27,6 +32,8 @@ export interface ParseResult {
   items: RawLineItem[];
   /** Rows skipped because their value cell was not a valid number. */
   skipped_rows: { row_label: string; period: string; raw_value: unknown }[];
+  /** The period column headers detected in the file (trimmed), in file order. */
+  detected_periods: string[];
 }
 
 /**
@@ -61,7 +68,7 @@ export function parseWorkbook(fileBuffer: ArrayBuffer): ParseResult {
     );
   }
 
-  const periodColumns = headerRow.slice(1).map((h) => String(h));
+  const periodColumns = headerRow.slice(1).map((h) => String(h).trim());
 
   const items: RawLineItem[] = [];
   const skipped_rows: ParseResult["skipped_rows"] = [];
@@ -90,5 +97,5 @@ export function parseWorkbook(fileBuffer: ArrayBuffer): ParseResult {
     }
   }
 
-  return { items, skipped_rows };
+  return { items, skipped_rows, detected_periods: periodColumns };
 }

@@ -4,6 +4,9 @@ import { resolveParameterName } from "../../pipeline/pipeline";
 interface ChangesPanelProps {
   changes: ObservedChange[];
   skippedParameterIds: string[];
+  detectedPeriods: string[];
+  fromPeriod: string;
+  toPeriod: string;
   kb: FRFKnowledgeBase;
   selectedParameterId: string | null;
   onSelectParameter: (parameter_id: string) => void;
@@ -21,10 +24,17 @@ const percentFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits:
 export function ChangesPanel({
   changes,
   skippedParameterIds,
+  detectedPeriods,
+  fromPeriod,
+  toPeriod,
   kb,
   selectedParameterId,
   onSelectParameter,
 }: ChangesPanelProps) {
+  const fromPeriodFound = detectedPeriods.includes(fromPeriod);
+  const toPeriodFound = detectedPeriods.includes(toPeriod);
+  const hasPeriodMismatch = skippedParameterIds.length > 0 && (!fromPeriodFound || !toPeriodFound);
+
   return (
     <section aria-labelledby="changes-heading" className="border-b border-ink/15 pb-8 mb-8">
       <h2 id="changes-heading" className="text-lg font-medium mb-1">
@@ -83,10 +93,35 @@ export function ChangesPanel({
       )}
 
       {skippedParameterIds.length > 0 && (
-        <p className="text-xs text-slate mt-3">
-          Skipped (missing a value in one of the selected periods, or zero base value):{" "}
-          {skippedParameterIds.map((id) => resolveParameterName(id, kb)).join(", ")}
-        </p>
+        <div className="mt-3">
+          {hasPeriodMismatch ? (
+            <p role="alert" className="text-xs text-rust">
+              {skippedParameterIds.length} mapped parameter{skippedParameterIds.length > 1 ? "s were" : " was"}{" "}
+              skipped because the period{!fromPeriodFound && !toPeriodFound ? "s" : ""} you entered
+              {!fromPeriodFound && (
+                <>
+                  {" "}
+                  (<span className="font-mono">"{fromPeriod}"</span>)
+                </>
+              )}
+              {!fromPeriodFound && !toPeriodFound && " and"}
+              {!toPeriodFound && (
+                <>
+                  {" "}
+                  (<span className="font-mono">"{toPeriod}"</span>)
+                </>
+              )}{" "}
+              {!fromPeriodFound && !toPeriodFound ? "don't" : "doesn't"} match any column header found in
+              the file. Columns detected in the file:{" "}
+              {detectedPeriods.map((p) => `"${p}"`).join(", ")}.
+            </p>
+          ) : (
+            <p className="text-xs text-slate">
+              Skipped (missing a value in one of the selected periods, or zero base value):{" "}
+              {skippedParameterIds.map((id) => resolveParameterName(id, kb)).join(", ")}
+            </p>
+          )}
+        </div>
       )}
     </section>
   );

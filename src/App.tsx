@@ -3,6 +3,7 @@ import { UploadPanel, type UploadStatus } from "./ui/components/UploadPanel";
 import { MappingPanel } from "./ui/components/MappingPanel";
 import { ChangesPanel } from "./ui/components/ChangesPanel";
 import { RelationshipsPanel } from "./ui/components/RelationshipsPanel";
+import { AIHypothesisPanel } from "./ui/components/AIHypothesisPanel";
 import { runPipeline } from "./pipeline/pipeline";
 import type { PipelineResult } from "./types/frf.types";
 import type { FRFKnowledgeBase } from "./frf-engine/knowledge-base/schema";
@@ -102,11 +103,19 @@ export default function App() {
             <ChangesPanel
               changes={result.observed_changes}
               skippedParameterIds={result.skipped_parameter_ids}
+              detectedPeriods={result.detected_periods}
+              fromPeriod={fromPeriod.trim()}
+              toPeriod={toPeriod.trim()}
               kb={kb}
               selectedParameterId={selectedParameterId}
               onSelectParameter={setSelectedParameterId}
             />
             <RelationshipsPanel
+              selectedParameterId={selectedParameterId}
+              selectedChange={selectedChange}
+              matches={selectedMatches}
+            />
+            <AIHypothesisPanel
               selectedParameterId={selectedParameterId}
               selectedChange={selectedChange}
               matches={selectedMatches}

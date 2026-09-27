@@ -88,6 +88,43 @@ describe("runPipeline — end to end", () => {
     expect(result.observed_changes.map((c) => c.parameter_id)).not.toContain("P_002");
   });
 
+  it("regression: does not skip parameters when the Excel header has a trailing space (originally reported bug)", () => {
+    // Reproduces the exact reported scenario: mapping succeeds, but a
+    // trailing space on the FY2023 column header meant computeChanges
+    // could never match the "FY2023" from_period the user typed, so
+    // every mapped parameter was silently skipped as "missing a value".
+    const buffer = buildWorkbookBuffer([
+      ["Line Item", "FY2023 ", "FY2024"], // trailing space on FY2023
+      ["Total Revenue", 100, 120],
+      ["Debtors", 20, 40],
+      ["Cash Flow from Operations", 15, 2],
+      ["Completely Unknown Line Item", 50, 65],
+    ]);
+
+    const result = runPipeline(buffer, "FY2023", "FY2024", kb);
+
+    expect(result.detected_periods).toEqual(["FY2023", "FY2024"]);
+    expect(result.skipped_parameter_ids).toHaveLength(0);
+    expect(result.observed_changes).toHaveLength(3);
+    expect(result.observed_changes.map((c) => c.parameter_id).sort()).toEqual(["P_001", "P_002", "P_003"]);
+    // The unrecognized line item is correctly unmapped for a different
+    // reason (no matching alias), not related to the period bug.
+    expect(result.unmapped_items.length).toBeGreaterThan(0);
+  });
+
+  it("exposes detected_periods so a genuine period-name mismatch (not just whitespace) is diagnosable", () => {
+    const buffer = buildWorkbookBuffer([
+      ["Line Item", "FY23", "FY24"], // different naming convention than what caller queries
+      ["Total Revenue", 100, 120],
+    ]);
+
+    const result = runPipeline(buffer, "FY2023", "FY2024", kb);
+
+    expect(result.detected_periods).toEqual(["FY23", "FY24"]);
+    expect(result.skipped_parameter_ids).toContain("P_001");
+    expect(result.observed_changes).toHaveLength(0);
+  });
+
   it("returns no relationship matches when an observed change has no corresponding relationship", () => {
     const buffer = buildWorkbookBuffer([
       ["Line Item", "FY2023", "FY2024"],
