@@ -1,7 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import * as XLSX from "xlsx";
 import App from "./App";
+
+// App renders AIHypothesisPanel, which calls model-loader's
+// getGenerator(), which dynamically imports @huggingface/transformers
+// and would otherwise try to download a real ~77M-parameter model from
+// Hugging Face's CDN. This test environment has no network access to
+// that CDN, so the package is mocked here — these App-level tests
+// verify that the UI wires real pipeline output into the AI panel and
+// handles its async loading/result states correctly, not real model
+// output quality (that is out of scope for an automated test; see
+// src/ai/README.md).
+vi.mock("@huggingface/transformers", () => ({
+  pipeline: vi.fn().mockResolvedValue(
+    vi.fn().mockResolvedValue([{ generated_text: "Mocked local model output for testing." }])
+  ),
+}));
 
 function buildTestFile(rows: (string | number)[][]): File {
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
@@ -94,21 +109,33 @@ describe("App — main workflow", () => {
     fireEvent.change(screen.getByLabelText(/later period/i), { target: { value: "FY2024" } });
     fireEvent.click(screen.getByRole("button", { name: /run analysis/i }));
 
-    // The panel should appear, clearly labeled as a prototype, and show
-    // the three required labels for the auto-selected Revenue parameter
-    // (which matches R_001 and R_003 in the seed set).
+    // The panel should appear, clearly labeled as local/experimental,
+    // and — once the (mocked) model resolves — show the three required
+    // labels for the auto-selected Revenue parameter (which matches
+    // R_001 and R_003 in the seed set).
     await waitFor(() => {
       expect(screen.getByText(/5\. on-device reasoning demo/i)).toBeInTheDocument();
     });
-    expect(screen.getByText(/prototype/i)).toBeInTheDocument();
+    expect(screen.getByText(/local & experimental/i)).toBeInTheDocument();
 
     const aiSection = screen.getByText(/5\. on-device reasoning demo/i).closest("section")!;
-    expect(within(aiSection).getAllByText(/^observation$/i).length).toBeGreaterThan(0);
+
+    // Wait for the async generateHypotheses() call (backed by the
+    // mocked model) to resolve and populate the hypothesis cards.
+    await waitFor(() => {
+      expect(within(aiSection).getAllByText(/^observation$/i).length).toBeGreaterThan(0);
+    });
     expect(within(aiSection).getAllByText(/^possible hypothesis$/i).length).toBeGreaterThan(0);
     expect(within(aiSection).getAllByText(/^evidence to verify$/i).length).toBeGreaterThan(0);
 
-    // Confirms it is explicitly disclosed as not a prediction.
-    expect(within(aiSection).getByText(/not a stock prediction/i)).toBeInTheDocument();
+    // The mocked model's output should actually appear — confirms the
+    // panel renders real (albeit mocked) model output, not static text.
+    expect(within(aiSection).getAllByText(/mocked local model output for testing/i).length).toBeGreaterThan(0);
+
+    // Confirms it is explicitly disclosed as not a prediction. This
+    // phrase intentionally appears twice (intro disclosure + closing
+    // disclaimer), so use getAllByText rather than getByText.
+    expect(within(aiSection).getAllByText(/not a stock prediction/i).length).toBeGreaterThan(0);
 
     // Content should reflect the actual observed change (Revenue +20%),
     // proving this reads real pipeline output, not placeholder text.
